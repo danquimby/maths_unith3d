@@ -15,6 +15,15 @@ public enum WindowsName
     NONE=-1
 }
 
+public enum TypeGame
+{
+    Multiplication, // Умножение
+    Division, // Деление
+    MixMultiplication, // Рандом Умножение
+    MixDivision, // Рандом Деление
+    None
+}
+
 [System.Serializable]
 public class Panel
 {
@@ -50,11 +59,14 @@ public class GameManager : MonoBehaviour
     public List<Question> questions;
     public static GameManager instance = null;
     public PlayerModel PlayerModel => _playerModel;
-    
-    // число на которое будет умножение -1 это рандом
-    public int MultiplicationValue = -1;
+
+    public TypeGame TypeCurrentGame = TypeGame.None;
+    // число на которое будет умножение -1 или деление
+    public int SelectedValue = -1;
     // счетчик для игры
     public int CountForGame = 8;
+    
+    
     void Awake () {
         if (instance == null) {
             instance = this;
@@ -82,10 +94,10 @@ public class GameManager : MonoBehaviour
 
     public void CreateNewStats()
     {
+        PlayerPrefs.DeleteKey("stats");
+
         _playerModel = new PlayerModel();
-        _playerModel.multiplications = new MultiplicationItemModel[8];
-        for (int i = 0; i < _playerModel.multiplications.Length; i++)
-            _playerModel.multiplications[i] = new MultiplicationItemModel(i+2, 0);
+        _playerModel.createSubModels(8);
         SaveCurrentStats();
         
     }
@@ -123,7 +135,7 @@ public class GameManager : MonoBehaviour
                 stars = 1;
                 break;
         }
-        MultiplicationItemModel model = PlayerModel.GetByValue(multiplication);
+        ResultItemModel model = PlayerModel.GetByValue(multiplication);
         Debug.Log("stars: " + stars);
         Debug.Log("notTrueAnswer: " + notTrueAnswer);
 

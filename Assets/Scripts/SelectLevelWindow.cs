@@ -8,32 +8,9 @@ public class SelectLevelWindow : WindowsBase
 
     protected override void onShow()
     {
-        bool previousBlocked = false;
-        int previousStars = 0;
-        for (var index = 0; index < selectItems.Length; index++)
+        foreach (LevelItem item in selectItems)
         {
-            LevelItem levelItem = selectItems[index];
-            bool blocked = false;
-            if (index > 0)
-            {
-                if (!previousBlocked)
-                {
-                    // предыдущий был не блокируемым
-                    int stars = GameManager.instance.PlayerModel.GetByValue(levelItem.multioplicationValue).stars;
-                    previousBlocked = stars == 0;
-                    if (index == 1 && previousStars == 0)
-                    {
-                        blocked = true;
-                    }
-                }
-                else
-                {
-                    blocked = true;    
-                }
-            }
-            previousStars = GameManager.instance.PlayerModel.GetByValue(levelItem.multioplicationValue).stars;
-            // TODO после совещания решили убрать замочки
-            levelItem.OnShow(false);
+            item.OnShow(false);
         }
     }
 

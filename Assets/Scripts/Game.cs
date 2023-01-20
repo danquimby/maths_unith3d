@@ -28,18 +28,18 @@ public class Game : WindowsBase
     [SerializeField] private int counterNotTrueAnswer = 0;
     private int preValue = -1; // значение на которое отвечали
     private int trueAnswer = -1; // правильное значение на вопрос
-    private int MultiplicationValue;
+    private int SelectedValue;
     private Question currentQuestion;
 
     protected override void onShow()
     {
         counterNotTrueAnswer = 0;
         GameManager.instance.NewGame();
-        MultiplicationValue = GameManager.instance.MultiplicationValue;
-        setNewNumberTile(MultiplicationValue);
+        SelectedValue = GameManager.instance.SelectedValue;
+        setNewNumberTile(SelectedValue);
     }
 
-    public void SetState(GameState state, int value)
+    public void SetState(int value)
     {
         if (trueAnswer == value)
         {
@@ -55,37 +55,55 @@ public class Game : WindowsBase
         if (GameManager.instance.questions.Count == GameManager.instance.CountForGame)
         {
             // конец игре нужно обсчитать
-            GameManager.instance.UpdateStats(MultiplicationValue, counterNotTrueAnswer);
+            GameManager.instance.UpdateStats(SelectedValue, counterNotTrueAnswer);
             GameManager.instance.SetNextState();
         }
         else
-            setNewNumberTile(MultiplicationValue);    
+            setNewNumberTile(SelectedValue);    
         
     }
 
     private void setNewNumberTile(int mainValue)
     {
-        Debug.Log("Начало игры " + mainValue);
         currentQuestion = new Question();
         // тут ответы которые мы покажем
         List<int> answers_int = new List<int>();
         int value = 0;
-        while (true)
-        {
-            value = Random.Range(2, 9);
-            if (preValue > 0 && value == preValue)
-                continue;
-            break;
-        }
 
+        if (GameManager.instance.TypeCurrentGame == TypeGame.Multiplication)
+        {
+            while (true)
+            {
+                value = Random.Range(2, 9);
+                if (preValue > 0 && value == preValue)
+                    continue;
+                break;
+            }
+            trueAnswer = value * mainValue;
+            currentQuestion.question = mainValue + " * " + value;
+        }
+        if (GameManager.instance.TypeCurrentGame == TypeGame.Division)
+        {
+            while (true)
+            {
+                value = Random.Range(2, 9);
+                if (preValue > 0 && value == preValue)
+                    continue;
+                break;
+            }
+            // 12 = 6 / 2
+            int multi = value * mainValue;
+            trueAnswer = value;
+            currentQuestion.question = multi + " / " + mainValue;
+        }
         preValue = value;
-        trueAnswer = value * mainValue;
-        currentQuestion.question = mainValue + " * " + value;
+
         panelQuestion.text = currentQuestion.question;
 
         for (int i = 0; i < _answers.Length; i++)
         {
-            int v = mainValue * Random.Range(2,9);
+            int v1 = Random.Range(2, 9);
+            int v = Random.Range(2, 9);//mainValue * v1;
             if (!isDuplicate(answers_int, v))
                 answers_int.Add(v);
             else
@@ -102,6 +120,8 @@ public class Game : WindowsBase
         {
             _answers[i].Number = answers_int[i];
         }
+
+        Debug.Log("Начало верный ответ: " + trueAnswer);
     }
 
     private bool isTrueAnserPresents(List<int> answers)

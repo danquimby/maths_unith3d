@@ -1,10 +1,11 @@
 using System;
 using System.Linq;
+using UnityEngine;
 
 [Serializable]
-public class MultiplicationItemModel
+public class ResultItemModel
 {
-    public MultiplicationItemModel(int value, int stars)
+    public ResultItemModel(int value, int stars)
     {
         this.value = value;
         this.stars = stars;
@@ -17,11 +18,37 @@ public class MultiplicationItemModel
 [Serializable]
 public class PlayerModel
 {
-    public MultiplicationItemModel[] multiplications;
+    public ResultItemModel[] multiplications; // умножение
+    public ResultItemModel[] mixmultiplications; // умножение
+    public ResultItemModel[] divisions; // деление
+    public ResultItemModel[] mixdivisions; // деление
 
-    public MultiplicationItemModel GetByValue(int value)
-    {
-        return multiplications.FirstOrDefault(model => model.value == value);
-    }
     
+    public ResultItemModel GetByValue(int value)
+    {
+        if (GameManager.instance.TypeCurrentGame == TypeGame.Multiplication)
+            return multiplications.FirstOrDefault(model => model.value == value);
+        if (GameManager.instance.TypeCurrentGame == TypeGame.Division)
+            return divisions.FirstOrDefault(model => model.value == value);
+        if (GameManager.instance.TypeCurrentGame == TypeGame.MixMultiplication)
+            return mixmultiplications.FirstOrDefault(model => model.value == value);
+        if (GameManager.instance.TypeCurrentGame == TypeGame.MixDivision)
+            return mixdivisions.FirstOrDefault(model => model.value == value);
+        throw new UnityException("not found type");
+    }
+
+    public void createSubModels(int length)
+    {
+        multiplications = new ResultItemModel[length];
+        fill(ref multiplications);
+
+        divisions = new ResultItemModel[length];
+        fill(ref divisions);
+    }
+
+    private void fill(ref ResultItemModel[] _array)
+    {
+        for (int i = 0; i < _array.Length; i++)
+            _array[i] = new ResultItemModel(i+2, 0);
+    }
 }

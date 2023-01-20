@@ -19,6 +19,6 @@ public class Answer : MonoBehaviour
     }
     public void onClick()
     {
-        GameManager.instance.MainGame.SetState(GameState.Result, number);
+        GameManager.instance.MainGame.SetState(number);
     }
 }
